@@ -35,7 +35,7 @@ def parse_match(id):
   say("Match id {0}, {1} victory. Dotabuff link: http://www.dotabuff.com/matches/{2}".format(match["match_id"], "Radiant" if match["radiant_win"] else "Dire", match["match_id"]))
 
 def say(message):
-  s.send(bytes("PRIVMSG {0} :{1}".format(CHANNEL, message), "UTF-8"))
+  s.send(bytes("PRIVMSG {0} :{1}\r\n".format(CHANNEL, message), "UTF-8"))
   
 
 s.connect((HOST, PORT))
@@ -58,7 +58,7 @@ while 1:
     print(line)
     line = line.split()
     if(line[0]=="PING"):
-      s.send("PONG {0}\r\n".format(line[1]), "UTF-8")
+      s.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
     elif(line[1]=="PRIVMSG"):
 
       #Commands start here
