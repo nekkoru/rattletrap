@@ -1,9 +1,10 @@
-import requests
 import dota2api
 import json
-import sys
+import re
+import requests
 import socket
 import string
+import sys
 from time import sleep
 
 #server / channel information
@@ -16,9 +17,11 @@ REALNAME = "Rattletrap the Clockwerk"
 NICKSERV = "changeme" # optional, if your network requires you to register
 CHANNEL = "#dota"
 
+STEAMID = re.compile("STEAM_0:0:\d{8,}")
+
 s = socket.socket()
-
-
+data_file = open("data.json", "r+")
+ids = json.load(data_file)
 api = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
 
 def findmatch(id):
@@ -36,7 +39,10 @@ def parse_match(id):
 
 def say(message):
   s.send(bytes("PRIVMSG {0} :{1}\r\n".format(CHANNEL, message), "UTF-8"))
-  
+
+def name(line):
+  clean_name = line.split("!")[0].lstrip(":")
+  return clean_name
 
 s.connect((HOST, PORT))
 s.send(bytes("NICK {0}\r\n".format(NICK), "UTF-8"))
@@ -48,28 +54,47 @@ s.send(bytes("JOIN {0}\r\n".format(CHANNEL), "UTF-8"))
 
 readbuffer = ""
 
-while 1:
-  readbuffer=readbuffer+s.recv(1024).decode("utf-8")
-  temp = readbuffer.split("\n")
-  readbuffer=temp.pop()
+try:
+ while 1:
+   readbuffer=readbuffer+s.recv(1024).decode("utf-8")
+   temp = readbuffer.split("\n")
+   readbuffer=temp.pop()
 
-  for line in temp:
-    line = line.rstrip()
-    print(line)
-    line = line.split()
-    if(line[0]=="PING"):
-      s.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
-    elif(line[1]=="PRIVMSG"):
+   for line in temp:
+     line = line.rstrip()
+     print(line)
+     line = line.split()
+     if(line[0]=="PING"):
+       s.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
+     elif(line[1]=="PRIVMSG"):
 
-      #Commands start here
+       #Commands start here
 
-      if(line[2]==CHANNEL):
-        if(line[3]==":!match"): #all messages start with a colon because of how IRC works
-          try:
-            val = int(line[4])
-          except ValueError:
-            say("Wrong match ID.")
-          else:
-            print("Match requested, ID {0}".format(line[4]))
-            parse_match(line[4])
+       if(line[2]==CHANNEL):
+         if(line[3]==":!match"): #all messages start with a colon because of how IRC works
+           try:
+             val = int(line[4])
+           except ValueError:
+             say("Wrong match ID.")
+           else:
+             print("Match requested, ID {0}".format(line[4]))
+             parse_match(line[4])
 
+         if(line[3]==":!setuser"):
+           try:
+             line[4] == True
+             try:
+               STEAMID.match(line[4])
+             except re.error:
+               say("Wrong SteamID format. I want something like this: STEAM_0:0:14527985")
+             else:
+               player = name(line[0])
+               ids[player] = line[4]
+               json.dump(ids, data_file)
+               say("Alright, your SteamID is {0}".format(line[4]))
+           except IndexError:
+             say("Usage: !setuser STEAM_0:0:14527985")
+except KeyboardInterrupt:
+  data_file.close()
+  sys.exit()
+             
