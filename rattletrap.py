@@ -37,6 +37,7 @@ def parse_match(id):
   match = findmatch(id)
   say("Match id {0}, {1} victory. Dotabuff link: http://www.dotabuff.com/matches/{2}".format(match["match_id"], "Radiant" if match["radiant_win"] else "Dire", match["match_id"]))
 
+
 def say(message):
   s.send(bytes("PRIVMSG {0} :{1}\r\n".format(CHANNEL, message), "UTF-8"))
 
@@ -71,7 +72,14 @@ try:
        #Commands start here
 
        if(line[2]==CHANNEL):
-         if(line[3]==":!match"): #all messages start with a colon because of how IRC works
+         if(line[3]==":!lastmatch"): #all messages start with a colon because of how IRC works
+           if name(line[0]) in ids:
+             matches = api.get_match_history(account_id=ids[name(line[0])], matches_requested=1)
+             #parse_match(matches["match"][0]["match_id"])
+             print(json.dumps(matches, sort_keys=True, indent=4))
+           else:
+             say("User not found. Do !setuser first.")
+         if(line[3]==":!match"):
            try:
              val = int(line[4])
            except ValueError:
@@ -84,16 +92,17 @@ try:
            try:
              line[4] == True
              try:
-               STEAMID.match(line[4])
-             except re.error:
-               say("Wrong SteamID format. I want something like this: STEAM_0:0:14527985")
+               val = int(line[4])
+             except ValueError:
+               say("Wrong Dota ID format. I want your ID from your Dotabuff url, like: https://dotabuff.com/players/<id>")
              else:
                player = name(line[0])
                ids[player] = line[4]
                json.dump(ids, data_file)
-               say("Alright, your SteamID is {0}".format(line[4]))
+               say("Alright, your Dota ID is {0}".format(line[4]))
            except IndexError:
-             say("Usage: !setuser STEAM_0:0:14527985")
+             say("Usage: !setuser <dotabuff_id>")
+
 except KeyboardInterrupt:
   data_file.close()
   sys.exit()
