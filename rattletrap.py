@@ -23,7 +23,7 @@ data_file = open("data.json", "r+")
 ids = json.load(data_file)
 api = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
 
-HEROES = api.get_heroes()[heroes]
+#HEROES = api.get_heroes()[heroes]
 
 def findmatch(id):
   try:
