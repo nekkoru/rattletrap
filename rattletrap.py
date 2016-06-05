@@ -63,7 +63,6 @@ try:
 
    for line in temp:
      line = line.rstrip()
-     print(line)
      line = line.split()
      if(line[0]=="PING"):
        s.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
@@ -72,13 +71,17 @@ try:
        #Commands start here
 
        if(line[2]==CHANNEL):
+         if(line[3]==":!commands" or line[3]==":!help"):
+           say("Available commands: !lastmatch, !match <match_id>, !setuser <dotabuff_id>")
          if(line[3]==":!lastmatch"): #all messages start with a colon because of how IRC works
            if name(line[0]) in ids:
              matches = api.get_match_history(account_id=ids[name(line[0])], matches_requested=1)
-             #parse_match(matches["match"][0]["match_id"])
-             print(json.dumps(matches, sort_keys=True, indent=4))
+             parse_match(matches["matches"][0]["match_id"])
+             print("!lastmatch called by {0} for matchID {1}".format(name(line[0]), matches["matches"][0]["match_id"]))
+             #print(json.dumps(matches, sort_keys=True, indent=4))
            else:
              say("User not found. Do !setuser first.")
+             print("!lastmatch was called, but {0} is not in the database".format(name(line[0])))
          if(line[3]==":!match"):
            try:
              val = int(line[4])
@@ -98,8 +101,11 @@ try:
              else:
                player = name(line[0])
                ids[player] = line[4]
+               data_file.seek(0)
+               data_file.truncate
                json.dump(ids, data_file)
                say("Alright, your Dota ID is {0}".format(line[4]))
+               print("{0} was added to the data file with Dota ID {1}".format(name(line[0]), line[4]))
            except IndexError:
              say("Usage: !setuser <dotabuff_id>")
 
