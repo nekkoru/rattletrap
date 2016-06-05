@@ -1,4 +1,4 @@
 *~
 example_scrape
 __pycache__/*
-database.db
+data.json
