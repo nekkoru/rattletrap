@@ -41,8 +41,8 @@ def parse_match(id, player_id=False):
   match = findmatch(id)
   say("Match id {0}, {1} victory. Dotabuff link: http://www.dotabuff.com/matches/{2}".format(match["match_id"], "Radiant" if match["radiant_win"] else "Dire", match["match_id"]))
   
-  if player_id==True:
-    if player_id in match[players]
+ # if player_id==True:
+  #  if player_id in match[players]
 
 
 def say(message):
