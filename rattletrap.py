@@ -31,7 +31,7 @@ def findmatch(id):
     #print(json.dumps(match, sort_keys=True, indent=2))
     return match
   
-  except: dota2api.src.exceptions.APIError:
+  except dota2api.src.exceptions.APIError:
     say("No match specified")
 
   except dota2api.src.exceptions.APITimeoutError:
