@@ -27,7 +27,7 @@ data_file = open("data.json", "r+")
 ids = json.load(data_file)
 API = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
 HEROES = ""
-DOTABUFF = re.compile("http://www.dotabuff.com/matches/\d+")
+DOTABUFF = re.compile(":http://www.dotabuff.com/matches/\d+")
 
 while HEROES == "":
     # This is a very ugly hack, but it has to do for now;
@@ -81,7 +81,6 @@ def last_match(name):
 
 def parse_match(match_id, name=""):
     """ parses the match and figures out whether the username invoking took part in it (WIP) """
-    print("Name passed: {0}".format(name))
     match = find_match(match_id)
     if match is not None:
         say("Match id {0}, {1} victory. Dotabuff link: "
@@ -90,17 +89,22 @@ def parse_match(match_id, name=""):
                 "Radiant" if match["radiant_win"] else "Dire",
                 match["match_id"]))
         #check whether player calling the match was in the game
-        if name == True:
-            print("Players: ")
+        if name != "":
             for player in match["players"]:
-                print(player["account_id"], HEROES[player["hero_id"] - 1])
-                if player["account_id"] == ids[name]:
+                if player["account_id"] == int(ids[name]):
                 
-                    say("You played {0} and went {1} / {2} / {3}".format(
-                        HEROES[player["hero_id"] - 1],
+                    say("You played {0} and went {1}/{2}/{3}. KDA {4}, {5} LH / {6} DN, {7} GPM, {8} XPM, {9} HD, {10} TD".format(
+                        HEROES[player["hero_id"] - 1]["localized_name"],
                         player["kills"],
                         player["deaths"],
-                        player["assists"]))
+                        player["assists"],
+                        player["kills"] + player["assists"] / player["deaths"],
+                        player["last_hits"],
+                        player["denies"],
+                        player["gold_per_min"],
+                        player["xp_per_min"],
+                        player["hero_damage"],
+                        player["tower_damage"]))
 
 def set_user(name, dotaid):
     ids[name] = dotaid
@@ -154,9 +158,8 @@ try:
 
                     if DOTABUFF.match(line[3]):
                         url = line[3].split("/")
-                        print(url)
-                        print("Match requested, ID {0}".format(url[3]))
-                        parse_match(url[3], name(line[0]))
+                        print("Match requested, ID {0}".format(url[4]))
+                        parse_match(url[4], name(line[0]))
 
                     if line[3] == ":!setuser":
                         try:
