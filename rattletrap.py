@@ -26,18 +26,7 @@ S = socket.socket()
 data_file = open("data.json", "r+")
 ids = json.load(data_file)
 API = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
-HEROES = ""
 DOTABUFF = re.compile(":http://www.dotabuff.com/matches/\d+")
-
-while HEROES == "":
-    # This is a very ugly hack, but it has to do for now;
-    # basically, keep trying to connect to the dota 2 api
-    # to grab the heroes data until it succeeds.
-    # If you have a better solution to this, please help.
-    try:
-        HEROES = API.get_heroes()["heroes"]
-    except dota2api.src.exceptions.APITimeoutError:
-        pass
 
 def find_match(match_id):
     """ returns a match by ID """
@@ -69,12 +58,16 @@ def commands():
 
 def last_match(name):
     if name in ids:
-        match_id = API.get_match_history(
-            account_id=ids[name],
-            matches_requested=1)["matches"][0]["match_id"]
-        parse_match(match_id, name)
-        print("!lastmatch called by {0} for matchID {1}".format(
-            name, match_id))
+        try:
+            match_id = API.get_match_history(
+                account_id=ids[name],
+                matches_requested=1)["matches"][0]["match_id"]
+        except dota2api.src.exceptions.APIError:
+            say("Couldn't retrieve match. Is your profile set to private?");
+        else:
+            parse_match(match_id, name)
+            print("!lastmatch called by {0} for matchID {1}".format(
+                name, match_id))
     else:
         say("User not found. Do !setuser first.")
         print("!lastmatch was called, but {0} is not in the database".format(name))
@@ -94,7 +87,7 @@ def parse_match(match_id, name=""):
                 if player["account_id"] == int(ids[name]):
                 
                     say("You played {0} and went {1}/{2}/{3}. KDA {4}, {5} LH / {6} DN, {7} GPM, {8} XPM, {9} HD, {10} TD".format(
-                        HEROES[player["hero_id"] - 1]["localized_name"],
+                        player["hero_name"],
                         player["kills"],
                         player["deaths"],
                         player["assists"],
