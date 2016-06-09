@@ -35,7 +35,7 @@ while HEROES == "":
     # to grab the heroes data until it succeeds.
     # If you have a better solution to this, please help.
     try:
-        HEROES = api.get_heroes()["heroes"]
+        HEROES = API.get_heroes()["heroes"]
     except dota2api.src.exceptions.APITimeoutError:
         pass
 
@@ -72,7 +72,7 @@ def last_match(name):
         match_id = API.get_match_history(
             account_id=ids[name],
             matches_requested=1)["matches"][0]["match_id"]
-        parse_match(match_id)
+        parse_match(match_id, name)
         print("!lastmatch called by {0} for matchID {1}".format(
             name, match_id))
     else:
