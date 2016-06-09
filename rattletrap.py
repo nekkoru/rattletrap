@@ -77,10 +77,11 @@ def last_match(name):
             name, match_id))
     else:
         say("User not found. Do !setuser first.")
-        print("!lastmatch was called, but {0} is not in the database".format(name(line[0])))
+        print("!lastmatch was called, but {0} is not in the database".format(name))
 
-def parse_match(match_id, name=False):
+def parse_match(match_id, name=""):
     """ parses the match and figures out whether the username invoking took part in it (WIP) """
+    print("Name passed: {0}".format(name))
     match = find_match(match_id)
     if match is not None:
         say("Match id {0}, {1} victory. Dotabuff link: "
@@ -90,7 +91,9 @@ def parse_match(match_id, name=False):
                 match["match_id"]))
         #check whether player calling the match was in the game
         if name == True:
+            print("Players: ")
             for player in match["players"]:
+                print(player["account_id"], HEROES[player["hero_id"] - 1])
                 if player["account_id"] == ids[name]:
                 
                     say("You played {0} and went {1} / {2} / {3}".format(
@@ -151,6 +154,7 @@ try:
 
                     if DOTABUFF.match(line[3]):
                         url = line[3].split("/")
+                        print(url)
                         print("Match requested, ID {0}".format(url[3]))
                         parse_match(url[3], name(line[0]))
 
