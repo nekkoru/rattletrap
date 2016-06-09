@@ -2,3 +2,5 @@
 example_scrape
 __pycache__/*
 data.json
+#~
+.#~
