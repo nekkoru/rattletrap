@@ -7,6 +7,7 @@ Edit this file to put in your connection details
 """
 import dota2api
 import json
+import re
 import socket
 import sys
 from time import sleep
@@ -21,13 +22,24 @@ REALNAME = "Rattletrap the Clockwerk"
 NICKSERV = "changeme" # optional, if your network requires you to register
 CHANNEL = "#dota"
 
-
 S = socket.socket()
 data_file = open("data.json", "r+")
 ids = json.load(data_file)
 API = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
+HEROES = ""
+DOTABUFF = re.compile("http://www.dotabuff.com/matches/\d+")
 
-def findmatch(match_id):
+while HEROES == "":
+    # This is a very ugly hack, but it has to do for now;
+    # basically, keep trying to connect to the dota 2 api
+    # to grab the heroes data until it succeeds.
+    # If you have a better solution to this, please help.
+    try:
+        HEROES = api.get_heroes()["heroes"]
+    except dota2api.src.exceptions.APITimeoutError:
+        pass
+
+def find_match(match_id):
     """ returns a match by ID """
     try:
         match = API.get_match_details(match_id=match_id)
@@ -38,16 +50,6 @@ def findmatch(match_id):
 
     except dota2api.src.exceptions.APITimeoutError:
         say("503 API unavailable.")
-
-def parse_match(match_id):
-    """ parses the match and figures out whether the username invoking took part in it (WIP) """
-    match = findmatch(match_id)
-    if match is not None:
-        say("Match id {0}, {1} victory. Dotabuff link: "
-            "http://www.dotabuff.com/matches/{2}".format(
-                match["match_id"],
-                "Radiant" if match["radiant_win"] else "Dire",
-                match["match_id"]))
 
 def say(message):
     """ says stuff to the channel """
@@ -65,7 +67,7 @@ def commands():
     """ displays the available commands. """
     say("Available commands: !lastmatch, !match <match_id>, !setuser <dotabuff_id>")
 
-def lastmatch(name):
+def last_match(name):
     if name in ids:
         match_id = API.get_match_history(
             account_id=ids[name],
@@ -77,12 +79,32 @@ def lastmatch(name):
         say("User not found. Do !setuser first.")
         print("!lastmatch was called, but {0} is not in the database".format(name(line[0])))
 
+def parse_match(match_id, name=False):
+    """ parses the match and figures out whether the username invoking took part in it (WIP) """
+    match = find_match(match_id)
+    if match is not None:
+        say("Match id {0}, {1} victory. Dotabuff link: "
+            "http://www.dotabuff.com/matches/{2}".format(
+                match["match_id"],
+                "Radiant" if match["radiant_win"] else "Dire",
+                match["match_id"]))
+        #check whether player calling the match was in the game
+        if name == True:
+            for player in match["players"]:
+                if player["account_id"] == ids[name]:
+                
+                    say("You played {0} and went {1} / {2} / {3}".format(
+                        HEROES[player["hero_id"] - 1],
+                        player["kills"],
+                        player["deaths"],
+                        player["assists"]))
+
 def set_user(name, dotaid):
     ids[name] = dotaid
     data_file.seek(0)
     data_file.truncate
     json.dump(ids, data_file)
-    say("Alright, your Dota ID is {0}".format(dotaid)
+    say("Alright, your Dota ID is {0}".format(dotaid))
     print("{0} was added to the data file with Dota ID {1}".format(
         name, dotaid))
 
@@ -94,7 +116,6 @@ sleep(3)
 S.send(bytes("PRIVMSG nickserv :identify {0}\r\n".format(NICKSERV),
              "UTF-8"))
 S.send(bytes("JOIN {0}\r\n".format(CHANNEL), "UTF-8"))
-
 
 readbuffer = ""
 
@@ -117,7 +138,7 @@ try:
                         commands()
 
                     if line[3] == ":!lastmatch":
-                        lastmach(name(line[0]))
+                        last_match(name(line[0]))
 
                     if line[3] == ":!match":
                         try:
@@ -126,7 +147,12 @@ try:
                             say("Wrong match ID.")
                         else:
                             print("Match requested, ID {0}".format(line[4]))
-                            parse_match(line[4])
+                            parse_match(line[4], name(line[0]))
+
+                    if DOTABUFF.match(line[3]):
+                        url = line[3].split("/")
+                        print("Match requested, ID {0}".format(url[3]))
+                        parse_match(url[3], name(line[0]))
 
                     if line[3] == ":!setuser":
                         try:
@@ -137,7 +163,7 @@ try:
                                 say("Wrong Dota ID format. O want your ID from your Dotabuff url,"
                                     " like: https://dotabuff.com/players/<id>")
                             else:
-                                set_user(name(line[0], line[4])
+                                set_user(name(line[0]), line[4])
                         except IndexError:
                             say("Usage: !setuser <dotabuff_id>")
 
