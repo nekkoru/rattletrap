@@ -59,6 +59,33 @@ def name(mask):
     clean_name = mask.split("!")[0].lstrip(":")
     return clean_name
 
+# Custom commands start here, triggers below
+
+def commands():
+    """ displays the available commands. """
+    say("Available commands: !lastmatch, !match <match_id>, !setuser <dotabuff_id>")
+
+def lastmatch(name):
+    if name in ids:
+        match_id = API.get_match_history(
+            account_id=ids[name],
+            matches_requested=1)["matches"][0]["match_id"]
+        parse_match(match_id)
+        print("!lastmatch called by {0} for matchID {1}".format(
+            name, match_id))
+    else:
+        say("User not found. Do !setuser first.")
+        print("!lastmatch was called, but {0} is not in the database".format(name(line[0])))
+
+def set_user(name, dotaid):
+    ids[name] = dotaid
+    data_file.seek(0)
+    data_file.truncate
+    json.dump(ids, data_file)
+    say("Alright, your Dota ID is {0}".format(dotaid)
+    print("{0} was added to the data file with Dota ID {1}".format(
+        name, dotaid))
+
 S.connect((HOST, PORT))
 S.send(bytes("NICK {0}\r\n".format(NICK), "UTF-8"))
 S.send(bytes("USER {0} {1} bla :{2}\r\n".format(
@@ -83,26 +110,14 @@ try:
                 S.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
             elif line[1] == "PRIVMSG":
 
-       #Commands start here
+       #Command triggers start here
 
                 if line[2] == CHANNEL:
                     if line[3] == ":!commands" or line[3] == ":!help":
-                        say("Available commands: !lastmatch,"
-                            "!match <match_id>, !setuser <dotabuff_id>")
+                        commands()
 
                     if line[3] == ":!lastmatch":
-                        if name(line[0]) in ids:
-                            matches = API.get_match_history(
-                                account_id=ids[name(line[0])],
-                                matches_requested=1)
-                            parse_match(matches["matches"][0]["match_id"])
-                            print("!lastmatch called by {0} for matchID {1}".format(
-                                name(line[0]),
-                                ["matches"][0]["match_id"]))
-
-                        else:
-                            say("User not found. Do !setuser first.")
-                            print("!lastmatch was called, but {0} is not in the database".format(name(line[0])))
+                        lastmach(name(line[0]))
 
                     if line[3] == ":!match":
                         try:
@@ -122,14 +137,7 @@ try:
                                 say("Wrong Dota ID format. O want your ID from your Dotabuff url,"
                                     " like: https://dotabuff.com/players/<id>")
                             else:
-                                player = name(line[0])
-                                ids[player] = line[4]
-                                data_file.seek(0)
-                                data_file.truncate
-                                json.dump(ids, data_file)
-                                say("Alright, your Dota ID is {0}".format(line[4]))
-                                print("{0} was added to the data file with Dota ID {1}".format(
-                                    name(line[0]), line[4]))
+                                set_user(name(line[0], line[4])
                         except IndexError:
                             say("Usage: !setuser <dotabuff_id>")
 
