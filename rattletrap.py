@@ -64,6 +64,8 @@ def last_match(name):
                 matches_requested=1)["matches"][0]["match_id"]
         except dota2api.src.exceptions.APIError:
             say("Couldn't retrieve match. Is your profile set to private?");
+        except dota2api.src.exception.APITimeoutError:
+            say("503 API unavailable.")
         else:
             parse_match(match_id, name)
             print("!lastmatch called by {0} for matchID {1}".format(
@@ -143,7 +145,7 @@ try:
                     if line[3] == ":!match":
                         try:
                             val = int(line[4])
-                        except ValueError:
+                        except ValueError or IndexError:
                             say("Wrong match ID.")
                         else:
                             print("Match requested, ID {0}".format(line[4]))
@@ -160,7 +162,7 @@ try:
                             try:
                                 val = int(line[4])
                             except ValueError:
-                                say("Wrong Dota ID format. O want your ID from your Dotabuff url,"
+                                say("Wrong Dota ID format. I want your ID from your Dotabuff url,"
                                     " like: https://dotabuff.com/players/<id>")
                             else:
                                 set_user(name(line[0]), line[4])
