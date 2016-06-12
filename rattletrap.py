@@ -64,7 +64,7 @@ def last_match(name):
                 matches_requested=1)["matches"][0]["match_id"]
         except dota2api.src.exceptions.APIError:
             say("Couldn't retrieve match. Is your profile set to private?");
-        except dota2api.src.exception.APITimeoutError:
+        except dota2api.src.exceptions.APITimeoutError:
             say("503 API unavailable.")
         else:
             parse_match(match_id, name)
