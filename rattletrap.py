@@ -93,7 +93,7 @@ def parse_match(match_id, name=""):
                         player["kills"],
                         player["deaths"],
                         player["assists"],
-                        player["kills"] + player["assists"] / player["deaths"],
+                        round(player["kills"] + player["assists"] / player["deaths"], 2),
                         player["last_hits"],
                         player["denies"],
                         player["gold_per_min"],
