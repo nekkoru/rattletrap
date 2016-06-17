@@ -29,15 +29,22 @@ API = dota2api.Initialise("E337281DA466818041F26B4AD42F7C4A")
 DOTABUFF = re.compile(":http://www.dotabuff.com/matches/\d+")
 
 def find_match(match_id):
-    """ returns a match by ID """
+    """ returns a match by ID, retries five times in case of API timeout """
+    match = None
+    r = 5
+    while not match and r > 0
     try:
         match = API.get_match_details(match_id=match_id)
         return match
 
     except dota2api.src.exceptions.APIError:
+        r = 0
         say("No match specified")
 
     except dota2api.src.exceptions.APITimeoutError:
+        r -= 1
+        print("API unavailable, retrying...")
+        sleep(1)
         say("503 API unavailable.")
 
 def say(message):
@@ -117,65 +124,67 @@ def set_user(name, dotaid):
     print("{0} was added to the data file with Dota ID {1}".format(
         name, dotaid))
 
-S.connect((HOST, PORT))
-S.send(bytes("NICK {0}\r\n".format(NICK), "UTF-8"))
-S.send(bytes("USER {0} {1} bla :{2}\r\n".format(
-    IDENT, HOST, REALNAME), "UTF-8"))
-sleep(3)
-S.send(bytes("PRIVMSG nickserv :identify {0}\r\n".format(NICKSERV),
-             "UTF-8"))
-S.send(bytes("JOIN {0}\r\n".format(CHANNEL), "UTF-8"))
 
-readbuffer = ""
-
-try:
-    while 1:
-        readbuffer = readbuffer + S.recv(1024).decode("utf-8")
-        temp = readbuffer.split("\n")
-        readbuffer = temp.pop()
-        for line in temp:
-            line = line.rstrip()
-            line = line.split()
-            if line[0] == "PING":
-                S.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
-            elif line[1] == "PRIVMSG":
-
-       #Command triggers start here
-
-                if line[2] == CHANNEL:
-                    if line[3] == ":!commands" or line[3] == ":!help":
-                        commands()
-
-                    if line[3] == ":!lastmatch":
-                        last_match(name(line[0]))
-
-                    if line[3] == ":!match":
-                        try:
-                            val = int(line[4])
-                        except ValueError or IndexError:
-                            say("Wrong match ID.")
-                        else:
-                            print("Match requested, ID {0}".format(line[4]))
-                            parse_match(line[4], name(line[0]))
-
-                    if DOTABUFF.match(line[3]):
-                        url = line[3].split("/")
-                        print("Match requested, ID {0}".format(url[4]))
-                        parse_match(url[4], name(line[0]))
-
-                    if line[3] == ":!setuser":
-                        try:
-                            line[4] == True
+if __name__ == '__main__':
+    S.connect((HOST, PORT))
+    S.send(bytes("NICK {0}\r\n".format(NICK), "UTF-8"))
+    S.send(bytes("USER {0} {1} bla :{2}\r\n".format(
+        IDENT, HOST, REALNAME), "UTF-8"))
+    sleep(3)
+    S.send(bytes("PRIVMSG nickserv :identify {0}\r\n".format(NICKSERV),
+                 "UTF-8"))
+    S.send(bytes("JOIN {0}\r\n".format(CHANNEL), "UTF-8"))
+    
+    readbuffer = ""
+    
+    try:
+        while 1:
+            readbuffer = readbuffer + S.recv(1024).decode("utf-8")
+            temp = readbuffer.split("\n")
+            readbuffer = temp.pop()
+            for line in temp:
+                line = line.rstrip()
+                line = line.split()
+                if line[0] == "PING":
+                    S.send(bytes("PONG {0}\r\n".format(line[1]), "UTF-8"))
+                elif line[1] == "PRIVMSG":
+                    
+                    #Command triggers start here
+                    
+                    if line[2] == CHANNEL:
+                        if line[3] == ":!commands" or line[3] == ":!help":
+                            commands()
+                            
+                        if line[3] == ":!lastmatch":
+                                last_match(name(line[0]))
+                                
+                        if line[3] == ":!match":
                             try:
                                 val = int(line[4])
-                            except ValueError:
-                                say("Wrong Dota ID format. I want your ID from your Dotabuff url,"
-                                    " like: https://dotabuff.com/players/<id>")
+                            except ValueError or IndexError:
+                                say("Wrong match ID.")
                             else:
-                                set_user(name(line[0]), line[4])
-                        except IndexError:
-                            say("Usage: !setuser <dotabuff_id>")
-
-except KeyboardInterrupt:
-    data_file.close()
-    sys.exit()
+                                print("Match requested, ID {0}".format(line[4]))
+                                parse_match(line[4], name(line[0]))
+                                        
+                        if DOTABUFF.match(line[3]):
+                            url = line[3].split("/")
+                            print("Match requested, ID {0}".format(url[4]))
+                            parse_match(url[4], name(line[0]))
+                                            
+                        if line[3] == ":!setuser":
+                            try:
+                                line[4] == True
+                                try:
+                                    val = int(line[4])
+                                except ValueError:
+                                    say("Wrong Dota ID format. I want your ID from your Dotabuff url,"
+                                        "like: https://dotabuff.com/players/<id>")
+                                else:
+                                    set_user(name(line[0]), line[4])
+                            except IndexError:
+                                say("Usage: !setuser <dotabuff_id>")
+                                                    
+    except KeyboardInterrupt:
+        data_file.close()
+        sys.exit()
