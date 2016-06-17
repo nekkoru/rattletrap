@@ -120,7 +120,7 @@ def parse_match(match_id, name=""):
                             player["tower_damage"]))
                     items = []
                     for i in range(5):
-                        if player.get("item_{}_name".foramt(i)) is not None:
+                        if player.get("item_{}_name".format(i)) is not None:
                             items.append(player["item_{}_name".format(i)])
                     say("Your items were: {}".format(", ".join(items)))
 
