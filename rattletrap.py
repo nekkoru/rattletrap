@@ -33,19 +33,19 @@ def find_match(match_id):
     match = None
     r = 5
     while not match and r > 0:
-    try:
-        match = API.get_match_details(match_id=match_id)
-        return match
-
-    except dota2api.src.exceptions.APIError:
-        r = 0
-        say("No match specified")
-
-    except dota2api.src.exceptions.APITimeoutError:
-        r -= 1
-        print("API unavailable, retrying...")
-        sleep(1)
-        say("503 API unavailable.")
+        try:
+            match = API.get_match_details(match_id=match_id)
+            return match
+        
+        except dota2api.src.exceptions.APIError:
+            r = 0
+            say("No match specified")
+            
+        except dota2api.src.exceptions.APITimeoutError:
+            r -= 1
+            print("API unavailable, retrying...")
+            sleep(1)
+            say("503 API unavailable.")
 
 def say(message):
     """ says stuff to the channel """
