@@ -32,7 +32,7 @@ def find_match(match_id):
     """ returns a match by ID, retries five times in case of API timeout """
     match = None
     r = 5
-    while not match and r > 0
+    while not match and r > 0:
     try:
         match = API.get_match_details(match_id=match_id)
         return match
