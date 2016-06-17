@@ -44,8 +44,11 @@ def find_match(match_id):
         except dota2api.src.exceptions.APITimeoutError:
             r -= 1
             print("API unavailable, retrying...")
-            sleep(1)
-            say("503 API unavailable.")
+            if r == 0:
+                say("503 API unavailable")
+            else:
+                sleep(1)
+            
 
 def say(message):
     """ says stuff to the channel """
