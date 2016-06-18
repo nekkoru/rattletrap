@@ -6,4 +6,12 @@ This is my first project in Python, so the code quality isn't very good and I've
 
 The IRC bot code is based on the [O'Reilly "Simple Python IRC Client"](http://archive.oreilly.com/pub/h/1968) and the improvements made to it by [Robert Szkutak](https://gist.github.com/RobertSzkutak/1326452). I'm fetching the data from the Dota 2 API using the [dota2api package.](https://pypi.python.org/pypi/dota2api).
 
+## TODO
+
+* Retrying the connection in case of timeouts (volvo pls fix)
+* Detecting all the players in the data file in a given match
+* Figuring out a concise way of displaying the items
+* Learning some actual python standards so the code doesn't look like cancer
+
+
 

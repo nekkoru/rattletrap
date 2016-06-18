@@ -85,28 +85,28 @@ def parse_match(match_id, name=""):
                 match["match_id"]))
         #check whether player calling the match was in the game
         if name != "":
-            for player in match["players"]:
-                if player["account_id"] == int(ids[name]):
-                
-                    say("You played {0} and went {1}/{2}/{3}. Level {4}, KDA {5}, {6} LH / {7} DN, {8} GPM, {9} XPM, {10} HD, {11} TD".format(
-                        player["hero_name"],
-                        player["kills"],
-                        player["deaths"],
-                        player["assists"],
-                        player["level"],
-                        round(player["kills"] + player["assists"] / player["deaths"], 2),
-                        player["last_hits"],
-                        player["denies"],
-                        player["gold_per_min"],
-                        player["xp_per_min"],
-                        player["hero_damage"],
-                        player["tower_damage"]))
-                    items = []
-                    for i in range(5):
-                        if player["item_{}_name".format(i)]:
-                            items.append(player["item_{}_name".format(i)])
-                            print(items)
-                    say("Your items were: {}".format(", ".join(items)))
+            if name in ids:
+                for player in match["players"]:
+                    if player["account_id"] == int(ids[name]):
+                        
+                        say("You played {0} and went {1}/{2}/{3}. Level {4}, KDA {5}, {6} LH / {7} DN, {8} GPM, {9} XPM, {10} HD, {11} TD".format(
+                            player["hero_name"],
+                            player["kills"],
+                            player["deaths"],
+                            player["assists"],
+                            player["level"],
+                            round(player["kills"] + player["assists"] / player["deaths"], 2),
+                            player["last_hits"],
+                            player["denies"],
+                            player["gold_per_min"],
+                            player["xp_per_min"],
+                            player["hero_damage"],
+                            player["tower_damage"]))
+                        items = []
+                        for i in range(5):
+                            if player["item_{}_name".format(i)]:
+                                items.append(player["item_{}_name".format(i)])
+                        say("Your items were: {}".format(", ".join(items)))
 
 def set_user(name, dotaid):
     ids[name] = dotaid
