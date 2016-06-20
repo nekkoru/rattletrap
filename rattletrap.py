@@ -101,26 +101,26 @@ def parse_match(match_id, name=""):
                         result = ""
                         if match["radiant_win"] == True and len(str(player["player_slot"])) == 1:
                             result = "won"
-                        elif match["radiant_win"] == False and len(str(player["player_slot"])) ==3:
+                        elif match["radiant_win"] == False and len(str(player["player_slot"])) == 3:
                             result = "won"
                         else:
                             result = "lost"
                             
-                            say("You played {0}, {1} the game and went {2}/{3}/{4}. Level {5}, KDA {6}, "
-                                "{7} LH / {8} DN, {9} GPM, {10} XPM, {11} HD, {12} TD".format(
-                                    player["hero_name"],
-                                    result,
-                                    player["kills"],
-                                    player["deaths"],
-                                    player["assists"],
-                                    player["level"],
-                                    round(player["kills"] + player["assists"] / player["deaths"], 2),
-                                    player["last_hits"],
-                                    player["denies"],
-                                    player["gold_per_min"],
-                                    player["xp_per_min"],
-                                    player["hero_damage"],
-                                    player["tower_damage"]))
+                        say("You played {0}, {1} the game and went {2}/{3}/{4}. Level {5}, KDA {6}, "
+                            "{7} LH / {8} DN, {9} GPM, {10} XPM, {11} HD, {12} TD".format(
+                                player["hero_name"],
+                                result,
+                                player["kills"],
+                                player["deaths"],
+                                player["assists"],
+                                player["level"],
+                                round(player["kills"] + player["assists"] / player["deaths"], 2),
+                                player["last_hits"],
+                                player["denies"],
+                                player["gold_per_min"],
+                                player["xp_per_min"],
+                                player["hero_damage"],
+                                player["tower_damage"]))
                              
                     items = []
                     for i in range(5):
