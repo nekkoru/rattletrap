@@ -122,11 +122,11 @@ def parse_match(match_id, name=""):
                                 player["hero_damage"],
                                 player["tower_damage"]))
                              
-                    items = []
-                    for i in range(5):
-                        if player.get("item_{}_name".format(i)) is not None:
-                            items.append(player["item_{}_name".format(i)])
-                    say("Your items were: {}".format(", ".join(items)))
+                        items = []
+                        for i in range(5):
+                            if player.get("item_{}_name".format(i)) is not None:
+                                items.append(player["item_{}_name".format(i)])
+                        say("Your items were: {}".format(", ".join(items)))
 
 def set_user(name, dotaid):
     ids[name] = dotaid
