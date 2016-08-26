@@ -48,7 +48,12 @@ def find_match(match_id):
                 say("503 API unavailable")
             else:
                 sleep(1)
-            
+
+def calc_kda(player):
+    if player["deaths"] > 0:
+        return round(player["kills"] + player["assists"] / player["deaths"], 2),
+    else:
+        return player["kills"] + player["assists"]
 
 def say(message):
     """ says stuff to the channel """
@@ -114,7 +119,7 @@ def parse_match(match_id, name=""):
                                 player["deaths"],
                                 player["assists"],
                                 player["level"],
-                                round(player["kills"] + player["assists"] / player["deaths"], 2),
+                                calc_kda(player),
                                 player["last_hits"],
                                 player["denies"],
                                 player["gold_per_min"],
