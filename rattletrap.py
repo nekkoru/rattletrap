@@ -51,7 +51,7 @@ def find_match(match_id):
 
 def calc_kda(player):
     if player["deaths"] > 0:
-        return round(player["kills"] + player["assists"] / player["deaths"], 2),
+        return round(player["kills"] + player["assists"] / player["deaths"], 2)
     else:
         return player["kills"] + player["assists"]
 
