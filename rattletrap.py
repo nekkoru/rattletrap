@@ -112,7 +112,7 @@ def parse_match(match_id, name=""):
                             result = "lost"
                             
                         say("You played {0}, {1} the game and went {2}/{3}/{4}. Level {5}, KDA {6}, "
-                            "{7} LH / {8} DN, {9} GPM, {10} XPM, {11} HD, {12} TD".format(
+                            "{7} LH / {8} DN, {9} GPM, {10} XPM, {11} HD, {12} TD, {13} HH".format(
                                 player["hero_name"],
                                 result,
                                 player["kills"],
@@ -125,7 +125,8 @@ def parse_match(match_id, name=""):
                                 player["gold_per_min"],
                                 player["xp_per_min"],
                                 player["hero_damage"],
-                                player["tower_damage"]))
+                                player["tower_damage"],
+                                player["hero_healing"]))
                              
                         items = []
                         for i in range(5):
